@@ -9,9 +9,11 @@ const chalk_1 = __importDefault(require("chalk"));
 const path_1 = __importDefault(require("path"));
 const php_component_1 = require("./generators/php-component");
 const php_components_bulk_1 = require("./generators/php-components-bulk");
+const ensure_package_1 = require("./generators/ensure-package");
+const copy_tailwind_1 = require("./generators/copy-tailwind");
 (async () => {
     /* ─────────────────────────────────────────────
-     * 1.  Parse command + flags
+     * 1.  Parse command & flags
      * ──────────────────────────────────────────── */
     const args = process.argv.slice(2);
     const [command, ...rest] = args;
@@ -38,12 +40,25 @@ const php_components_bulk_1 = require("./generators/php-components-bulk");
         }
     }
     /* ─────────────────────────────────────────────
-     * 2.  Destination directory
+     * 2.  Housekeeping steps (always run)
+     * ──────────────────────────────────────────── */
+    // 2.a Ensure tw-animate-css is installed
+    (0, ensure_package_1.ensurePackageInstalled)("tw-animate-css");
+    // 2.b Keep Tailwind theme up‑to‑date in the project
+    const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(flags.force);
+    if (cssUpdated) {
+        const relCss = path_1.default
+            .relative(process.cwd(), "src/app/css/tailwind.css")
+            .replace(/\\/g, "/");
+        console.log(chalk_1.default.green(`✔ Updated Tailwind CSS → ${relCss}`));
+    }
+    /* ─────────────────────────────────────────────
+     * 3.  Destination directory for components
      * ──────────────────────────────────────────── */
     const targetDir = path_1.default.resolve(flags.out ?? "src/Lib/PHPXUI");
     try {
         /* ─────────────────────────────────────────
-         * 3.  Bulk mode (all components)
+         * 4.  Bulk mode  (--all)
          * ───────────────────────────────────────── */
         if (flags.all) {
             const { ok, fail } = await (0, php_components_bulk_1.generateAllComponents)(targetDir, flags.force);
@@ -55,7 +70,7 @@ const php_components_bulk_1 = require("./generators/php-components-bulk");
             process.exit(fail.length ? 1 : 0);
         }
         /* ─────────────────────────────────────────
-         * 4.  Single or multiple names
+         * 5.  Interactive prompt if no names given
          * ───────────────────────────────────────── */
         if (names.length === 0) {
             const { componentList } = await (0, prompts_1.default)({
@@ -66,10 +81,11 @@ const php_components_bulk_1 = require("./generators/php-components-bulk");
             });
             names.push(...componentList.split(/[\s,]+/));
         }
-        /* -------- single / multiple names -------- */
+        /* ─────────────────────────────────────────
+         * 6.  Generate each requested component
+         * ───────────────────────────────────────── */
         for (const name of names) {
             const saved = await (0, php_component_1.generateComponent)(name, targetDir, flags.force);
-            // Normalize to array ― generateComponent may return string | string[]
             const paths = Array.isArray(saved) ? saved : [saved];
             for (const abs of paths) {
                 const rel = path_1.default.relative(process.cwd(), abs).replace(/\\/g, "/");
