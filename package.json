@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "chalk": "^5.4.1",
-    "change-case": "^5.4.4",
     "fs-extra": "^11.3.0",
     "node-fetch": "^3.3.2",
     "prompts": "^2.4.2"

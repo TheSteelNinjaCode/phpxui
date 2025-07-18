@@ -15,7 +15,7 @@ const path_1 = __importDefault(require("path"));
  */
 function copyTailwindCss(force = false) {
     // Path to the CSS bundled with the CLI
-    const source = path_1.default.resolve(__dirname, "../dist/css/tailwind.css");
+    const source = path_1.default.resolve(__dirname, "../css/tailwind.css");
     // Path inside the user’s project
     const target = path_1.default.resolve(process.cwd(), "src/app/css/tailwind.css");
     if (!force && fs_extra_1.default.existsSync(target)) {
