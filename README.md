@@ -1,4 +1,4 @@
-# **phpxui-cli** — Instant PHPXUI Component Generator 🚀
+# **phpxui‑cli** — Instant PHPXUI Component Generator 🚀
 
 > **Generate fully‑typed PHPXUI components for Prisma PHP right from the terminal.**
 > ⚡ **Single component** → `npx phpxui add Alert`   |   🌌 **Whole library** → `npx phpxui add --all`
@@ -7,13 +7,13 @@
 
 ## ✨ Features
 
-| Feature               | Details                                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------------------------- |
-| **Bulk install**      | `--all` downloads every component in a single compressed request.                                        |
-| **Ready‑to‑use code** | Each file already contains the `$class` merge logic and `{$attributes}` placeholder for Wave reactivity. |
-| **Clean paths**       | Files are written under `src/Lib/PHPXUI/FancyName.php` with OS‑agnostic separators.                      |
-| **Friendly output**   | Clear green / red summary with relative paths only.                                                      |
-| **Cross‑platform**    | Works equally on Windows, macOS and Linux.                                                               |
+| Feature               | Details                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Bulk install**      | `--all` downloads every component in one shot.                                                               |
+| **Ready‑to‑use code** | Each file already contains the `$class` merge logic and `{$attributes}` placeholder for **Wave** reactivity. |
+| **Clean paths**       | Files are written under `src/Lib/PHPXUI/FancyName.php` with OS‑agnostic separators.                          |
+| **Friendly output**   | Clear green / red summary with relative paths only.                                                          |
+| **Automatic icons**   | Core **PPIcons** (`x`, `chevron‑down`, `chevron‑right`) are installed on the very first run.                 |
 
 ---
 
@@ -47,6 +47,10 @@ npx phpxui add --all
 CLI output example:
 
 ```bash
+📦 Installing ppicons CLI…
+✨ Installing default icons: x chevron-down chevron-right
+✔ Icons installed in src/Lib/PPIcons
+
 ✔ Alert   → src/Lib/PHPXUI/Alert.php
 ✔ Dialog  → src/Lib/PHPXUI/Dialog.php
 ✔ Badge   → src/Lib/PHPXUI/Badge.php
@@ -84,8 +88,22 @@ class Alert extends PHPX
 | --------------- | -------------------------------------------------------- |
 | `<component …>` | One or more component names separated by space or comma. |
 | `--all`         | Download the full catalogue in one request.              |
-| `--out <dir>`   | Destination folder (default `src/Lib/PHPXUI`).           |
 | `--force`       | Overwrite existing files.                                |
+
+> **Note:** The CLI automatically installs a default set of core icons (such as `x`, `chevron-down`, `chevron-right`) on first use. Extra icons are not yet selectable via `phpxui` directly.
+
+---
+
+## 🎨 Using Additional Icons
+
+Need more icons? Use the **PPIcons** CLI directly:
+
+```bash
+npx ppicons add menu chevron-left arrow-right
+```
+
+This will place the requested icons under `src/Lib/PPIcons` with full PHPXUI typings.
+Browse the complete icon catalogue and usage docs at **[https://ppicons.tsnc.tech/](https://ppicons.tsnc.tech/)**.
 
 ---
 
@@ -97,19 +115,19 @@ Full guides and examples live at the [PHPXUI documentation site](https://phpxui.
 
 ## 💡 Contributing
 
-We welcome contributions to improve **phpxui-cli**. If you have ideas, found bugs, or want to add features, open an issue or submit a pull request.
+We welcome contributions to improve **phpxui‑cli**. If you have ideas, find bugs, or want to add features, open an issue or submit a pull request.
 
 ---
 
 ## 📄 License
 
-`phpxui-cli` is released under the MIT License. See `LICENSE` for details.
+`phpxui‑cli` is released under the MIT License. See `LICENSE` for details.
 
 ---
 
 ## 👤 Author
 
-This project is developed and maintained by [The Steel Ninja Code](https://thesteelninjacode.com/), continuously pushing the boundaries of PHP development.
+This project is developed and maintained by **The Steel Ninja Code**, continuously pushing the boundaries of PHP development.
 
 ---
 

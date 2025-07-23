@@ -11,6 +11,8 @@ const php_component_1 = require("./generators/php-component");
 const php_components_bulk_1 = require("./generators/php-components-bulk");
 const ensure_package_1 = require("./generators/ensure-package");
 const copy_tailwind_1 = require("./generators/copy-tailwind");
+const load_config_1 = require("./utils/load-config");
+const icons_1 = require("./commands/icons");
 (async () => {
     /* ─────────────────────────────────────────────
      * 1.  Parse command & flags
@@ -18,10 +20,10 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
     const args = process.argv.slice(2);
     const [command, ...rest] = args;
     if (command !== "add") {
-        console.log(chalk_1.default.blue("Usage: phpxui add [--all] [--out <dir>] [--force] <component…>"));
+        console.log(chalk_1.default.blue("Usage: phpxui add [--all] [--force] <component…>"));
         process.exit(0);
     }
-    const flags = { all: false, force: false, out: null };
+    const flags = { all: false, force: false };
     const names = [];
     for (let i = 0; i < rest.length; i++) {
         const tok = rest[i];
@@ -32,19 +34,37 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
             case "--force":
                 flags.force = true;
                 break;
-            case "--out":
-                flags.out = rest[++i] || null;
-                break;
             default:
                 names.push(tok);
         }
     }
     /* ─────────────────────────────────────────────
-     * 2.  Housekeeping steps (always run)
+     * 2.  Load config and run first-time icon install
      * ──────────────────────────────────────────── */
-    // 2.a Ensure tw-animate-css is installed
+    const config = (0, load_config_1.loadPhpXUIConfig)();
+    if (!config.iconsInstalled) {
+        await (0, icons_1.installIcons)([
+            "chevron-down",
+            "x",
+            "chevron-right",
+            "ellipsis",
+            "chevron-left",
+            "arrow-left",
+            "arrow-right",
+            "check",
+            "chevrons-up-down",
+            "search",
+            "circle",
+            "calendar",
+            "minus",
+            "chevron-up",
+            "panel-left",
+        ], config);
+    }
+    /* ─────────────────────────────────────────────
+     * 3.  Housekeeping steps (always run)
+     * ──────────────────────────────────────────── */
     (0, ensure_package_1.ensurePackageInstalled)("tw-animate-css");
-    // 2.b Keep Tailwind theme up‑to‑date in the project
     const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(flags.force);
     if (cssUpdated) {
         const relCss = path_1.default
@@ -53,12 +73,12 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
         console.log(chalk_1.default.green(`✔ Updated Tailwind CSS → ${relCss}`));
     }
     /* ─────────────────────────────────────────────
-     * 3.  Destination directory for components
+     * 4.  Resolve output directory
      * ──────────────────────────────────────────── */
-    const targetDir = path_1.default.resolve(flags.out ?? "src/Lib/PHPXUI");
+    const targetDir = path_1.default.resolve(config.outputDir || "src/Lib/PHPXUI");
     try {
         /* ─────────────────────────────────────────
-         * 4.  Bulk mode  (--all)
+         * 5.  Bulk mode  (--all)
          * ───────────────────────────────────────── */
         if (flags.all) {
             const { ok, fail } = await (0, php_components_bulk_1.generateAllComponents)(targetDir, flags.force);
@@ -70,7 +90,7 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
             process.exit(fail.length ? 1 : 0);
         }
         /* ─────────────────────────────────────────
-         * 5.  Interactive prompt if no names given
+         * 6.  Interactive prompt if no names given
          * ───────────────────────────────────────── */
         if (names.length === 0) {
             const { componentList } = await (0, prompts_1.default)({
@@ -82,7 +102,7 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
             names.push(...componentList.split(/[\s,]+/));
         }
         /* ─────────────────────────────────────────
-         * 6.  Generate each requested component
+         * 7.  Generate each requested component
          * ───────────────────────────────────────── */
         for (const name of names) {
             const saved = await (0, php_component_1.generateComponent)(name, targetDir, flags.force);
