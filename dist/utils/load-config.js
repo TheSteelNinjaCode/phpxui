@@ -24,14 +24,16 @@ const defaultConfig = {
     },
     iconLibrary: "ppicons",
 };
+// ⬇️ CHANGED: return { config, isFirstRun }
 function loadPhpXUIConfig() {
     const configPath = path_1.default.resolve("phpxui.json");
-    if (!fs_1.default.existsSync(configPath)) {
+    const existed = fs_1.default.existsSync(configPath);
+    if (!existed) {
         fs_1.default.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
         console.log("📦 Created default phpxui.json");
     }
     const content = fs_1.default.readFileSync(configPath, "utf-8");
-    return JSON.parse(content);
+    return { config: JSON.parse(content), isFirstRun: !existed };
 }
 function savePhpXUIConfig(config) {
     const configPath = path_1.default.resolve("phpxui.json");

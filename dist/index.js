@@ -14,9 +14,6 @@ const copy_tailwind_1 = require("./generators/copy-tailwind");
 const load_config_1 = require("./utils/load-config");
 const icons_1 = require("./commands/icons");
 (async () => {
-    /* ─────────────────────────────────────────────
-     * 1.  Parse command & flags
-     * ──────────────────────────────────────────── */
     const args = process.argv.slice(2);
     const [command, ...rest] = args;
     if (command !== "add") {
@@ -38,10 +35,8 @@ const icons_1 = require("./commands/icons");
                 names.push(tok);
         }
     }
-    /* ─────────────────────────────────────────────
-     * 2.  Load config and run first-time icon install
-     * ──────────────────────────────────────────── */
-    const config = (0, load_config_1.loadPhpXUIConfig)();
+    /* 2) Load config + detect first run */
+    const { config, isFirstRun } = (0, load_config_1.loadPhpXUIConfig)();
     if (!config.iconsInstalled) {
         await (0, icons_1.installIcons)([
             "chevron-down",
@@ -61,27 +56,30 @@ const icons_1 = require("./commands/icons");
             "panel-left",
         ], config);
     }
-    /* ─────────────────────────────────────────────
-     * 3.  Housekeeping steps (always run)
-     * ──────────────────────────────────────────── */
+    /* 3) Housekeeping */
     (0, ensure_package_1.ensurePackageInstalled)("tw-animate-css");
-    const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(flags.force);
+    // ⬇️ IMPORTANT:
+    // Tailwind base CSS should only be *forced* on *first run*.
+    // Later runs: copy only if missing (no overwrite), even if --force.
+    const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(isFirstRun /* ignore flags.force here */);
     if (cssUpdated) {
         const relCss = path_1.default
             .relative(process.cwd(), "src/app/css/tailwind.css")
             .replace(/\\/g, "/");
-        console.log(chalk_1.default.green(`✔ Updated Tailwind CSS → ${relCss}`));
+        console.log(chalk_1.default.green(isFirstRun
+            ? `✔ Installed base Tailwind CSS → ${relCss}`
+            : `✔ Added Tailwind CSS (missing) → ${relCss}`));
     }
-    /* ─────────────────────────────────────────────
-     * 4.  Resolve output directory
-     * ──────────────────────────────────────────── */
+    /* 4) Resolve output directory */
     const targetDir = path_1.default.resolve(config.outputDir || "src/Lib/PHPXUI");
     try {
-        /* ─────────────────────────────────────────
-         * 5.  Bulk mode  (--all)
-         * ───────────────────────────────────────── */
+        // ⬇️ Components overwrite policy:
+        // - First run: force overwrite (replace everything)
+        // - Otherwise: only overwrite when --force is passed
+        const componentForce = isFirstRun || flags.force;
+        /* 5) Bulk mode */
         if (flags.all) {
-            const { ok, fail } = await (0, php_components_bulk_1.generateAllComponents)(targetDir, flags.force);
+            const { ok, fail } = await (0, php_components_bulk_1.generateAllComponents)(targetDir, componentForce);
             console.log(chalk_1.default.green(`\n✔ Generated ${ok.length} components in ${path_1.default.relative(process.cwd(), targetDir)}`));
             if (fail.length) {
                 console.log(chalk_1.default.red(`✖ ${fail.length} failures:`));
@@ -89,23 +87,26 @@ const icons_1 = require("./commands/icons");
             }
             process.exit(fail.length ? 1 : 0);
         }
-        /* ─────────────────────────────────────────
-         * 6.  Interactive prompt if no names given
-         * ───────────────────────────────────────── */
+        /* 6) Interactive prompt if no names given */
         if (names.length === 0) {
             const { componentList } = await (0, prompts_1.default)({
                 type: "text",
                 name: "componentList",
-                message: "Which components do you want to add? (space‑ or comma‑separated)",
+                message: "Which components do you want to add? (space- or comma-separated)",
                 validate: (v) => (v.trim() ? true : "Enter at least one name"),
             });
             names.push(...componentList.split(/[\s,]+/));
         }
-        /* ─────────────────────────────────────────
-         * 7.  Generate each requested component
-         * ───────────────────────────────────────── */
+        /* 6.5) First-run: ensure core 'Slot' is installed (unless --all) */
+        if (isFirstRun && !flags.all) {
+            const hasSlot = names.some((n) => n.toLowerCase() === "slot");
+            if (!hasSlot) {
+                names.unshift("Slot"); // put it first so it logs clearly
+            }
+        }
+        /* 7) Generate each requested component */
         for (const name of names) {
-            const saved = await (0, php_component_1.generateComponent)(name, targetDir, flags.force);
+            const saved = await (0, php_component_1.generateComponent)(name, targetDir, componentForce);
             const paths = Array.isArray(saved) ? saved : [saved];
             for (const abs of paths) {
                 const rel = path_1.default.relative(process.cwd(), abs).replace(/\\/g, "/");
