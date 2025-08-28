@@ -13,6 +13,7 @@ const ensure_package_1 = require("./generators/ensure-package");
 const copy_tailwind_1 = require("./generators/copy-tailwind");
 const load_config_1 = require("./utils/load-config");
 const icons_1 = require("./commands/icons");
+const CORE_COMPONENTS = ["Slot", "Portal"];
 (async () => {
     const args = process.argv.slice(2);
     const [command, ...rest] = args;
@@ -58,9 +59,7 @@ const icons_1 = require("./commands/icons");
     }
     /* 3) Housekeeping */
     (0, ensure_package_1.ensurePackageInstalled)("tw-animate-css");
-    // ⬇️ IMPORTANT:
-    // Tailwind base CSS should only be *forced* on *first run*.
-    // Later runs: copy only if missing (no overwrite), even if --force.
+    // Tailwind base CSS: only forced on first run
     const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(isFirstRun /* ignore flags.force here */);
     if (cssUpdated) {
         const relCss = path_1.default
@@ -73,9 +72,7 @@ const icons_1 = require("./commands/icons");
     /* 4) Resolve output directory */
     const targetDir = path_1.default.resolve(config.outputDir || "src/Lib/PHPXUI");
     try {
-        // ⬇️ Components overwrite policy:
-        // - First run: force overwrite (replace everything)
-        // - Otherwise: only overwrite when --force is passed
+        // Overwrite policy
         const componentForce = isFirstRun || flags.force;
         /* 5) Bulk mode */
         if (flags.all) {
@@ -97,11 +94,14 @@ const icons_1 = require("./commands/icons");
             });
             names.push(...componentList.split(/[\s,]+/));
         }
-        /* 6.5) First-run: ensure core 'Slot' is installed (unless --all) */
+        /* 6.5) Ensure core components first on first-run (unless --all) */
         if (isFirstRun && !flags.all) {
-            const hasSlot = names.some((n) => n.toLowerCase() === "slot");
-            if (!hasSlot) {
-                names.unshift("Slot"); // put it first so it logs clearly
+            for (const core of CORE_COMPONENTS) {
+                const hasCore = names.some((n) => n.toLowerCase() === core.toLowerCase());
+                if (!hasCore) {
+                    // Put each core at the front in the declared order:
+                    names.unshift(core);
+                }
             }
         }
         /* 7) Generate each requested component */
