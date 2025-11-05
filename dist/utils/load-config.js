@@ -13,7 +13,7 @@ const defaultConfig = {
     outputDir: "src/Lib/PHPXUI",
     iconsInstalled: false,
     tailwind: {
-        css: "src/app/css/tailwind.css",
+        css: "src/app/global.css",
         baseColor: "neutral",
         cssVariables: true,
         prefix: "",
