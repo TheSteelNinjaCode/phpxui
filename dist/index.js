@@ -63,7 +63,7 @@ const CORE_COMPONENTS = ["Slot", "Portal"];
     const cssUpdated = (0, copy_tailwind_1.copyTailwindCss)(isFirstRun /* ignore flags.force here */);
     if (cssUpdated) {
         const relCss = path_1.default
-            .relative(process.cwd(), "src/app/css/tailwind.css")
+            .relative(process.cwd(), "src/app/globals.css")
             .replace(/\\/g, "/");
         console.log(chalk_1.default.green(isFirstRun
             ? `✔ Installed base Tailwind CSS → ${relCss}`
