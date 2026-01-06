@@ -1,6 +1,6 @@
 {
   "name": "phpxui",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A package for generating Prisma PHP components with a CLI interface.",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   ],
   "author": "Jefferson Abraham Omier <thesteelninjacode@gmail.com>",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.0.13",

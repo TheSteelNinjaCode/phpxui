@@ -1,0 +1,1 @@
+import fs from"fs-extra";import path from"path";export function getInstalledComponents(t){if(!fs.existsSync(t))return[];return fs.readdirSync(t).filter(t=>t.endsWith(".php")).map(t=>path.basename(t,".php"))}
