@@ -7,15 +7,18 @@
 
 ## ✨ Features
 
-| Feature                | Details                                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **Bulk install**       | `--all` downloads every component in one shot.                                                                   |
-| **Update in place**    | `update` scans your `outputDir` and re‑downloads every installed component (overwrite).                          |
-| **Ready‑to‑use code**  | Each file already contains the `$class` merge logic and `{$attributes}` placeholder for **Wave** reactivity.     |
-| **Clean paths**        | Files are written under `src/Lib/PHPXUI/FancyName.php` with OS‑agnostic separators.                              |
-| **Friendly output**    | Clear green / red summary with relative paths only.                                                              |
-| **Automatic icons**    | Core **PPIcons** (`x`, `chevron‑down`, `chevron‑right`, etc.) are installed on the very first run.               |
-| **Tailwind bootstrap** | Ensures `tw-animate-css` and (on first run / missing file) writes `src/app/globals.css` for a sensible baseline. |
+| Feature                | Details                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bulk install**       | `--all` downloads every component in one shot.                                                                                        |
+| **Update in place**    | `update` scans your `outputDir` and re‑downloads every installed component (overwrite).                                               |
+| **Ready‑to‑use code**  | Each file already contains the `$class` merge logic and `{$attributes}` placeholder for **Wave** reactivity.                          |
+| **Clean paths**        | Files are written under `src/Lib/PHPXUI/FancyName.php` with OS‑agnostic separators.                                                   |
+| **Friendly output**    | Clear green / red summary with relative paths only.                                                                                   |
+| **Automatic icons**    | Core **PPIcons** (`x`, `chevron‑down`, `chevron‑right`, etc.) are installed on the very first run.                                    |
+| **Tailwind bootstrap** | Ensures `tw-animate-css` and (on first run / missing file) writes `src/app/globals.css` for a sensible baseline.                      |
+| **AI project context** | Refreshes the `manifest` block inside `phpxui.json` and managed `AGENTS.md` / `.github/copilot-instructions.md` blocks after changes. |
+
+`phpxui.json` is the CLI's own config file. In a Prisma PHP app, the framework config remains the root `prisma-php.json` file.
 
 ---
 
@@ -149,6 +152,9 @@ On first run, **phpxui‑cli** creates a `phpxui.json` in your project root. The
 - `psr4`: mapping hints for components and icons
 - `iconsInstalled`: internal flag to avoid reinstalling the default icon set
 - `tailwind.css`: where the base CSS should live (default: `src/app/globals.css`)
+- `manifest`: auto-generated AI metadata and installed component inventory maintained by the CLI
+
+This file is separate from the Prisma PHP framework config in `prisma-php.json` at the project root.
 
 Example:
 
@@ -172,6 +178,18 @@ Example:
 
 ---
 
+## 🤖 AI Context
+
+After `add` or `update`, **phpxui-cli** refreshes these files in your project root:
+
+- `phpxui.json` (updates the `manifest` section)
+- `AGENTS.md`
+- `.github/copilot-instructions.md`
+
+The markdown files receive a managed `phpxui` block that inventories installed components, records the component catalogue endpoints, and preserves any manual content outside that block.
+
+---
+
 ## 🎨 Using Additional Icons
 
 Need more icons? Use the **PPIcons** CLI directly:
@@ -187,7 +205,7 @@ Browse the complete icon catalogue and usage docs at **https://ppicons.tsnc.tech
 
 ## 📚 Documentation
 
-Full guides and examples live at the PHPXUI documentation site: **https://phpxui.tsnc.tech/**
+Full guides and examples live at the PHPXUI documentation site: [https://phpxui.tsnc.tech/](https://phpxui.tsnc.tech/)
 
 ---
 
