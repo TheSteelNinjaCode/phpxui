@@ -1,1 +1,0 @@
-import path from"node:path";import{fileURLToPath}from"node:url";const __filename=fileURLToPath(import.meta.url),__dirname=path.dirname(__filename);export const STUB_PATH_PHP=path.resolve(__dirname,"../templates/icon.stub.php");export const STUB_PATH_PYTHON=path.resolve(__dirname,"../templates/icon.stub.py");

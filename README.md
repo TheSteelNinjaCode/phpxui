@@ -14,7 +14,7 @@
 | **Ready‑to‑use code**  | Each file already contains the `$class` merge logic and `{$attributes}` placeholder for **Wave** reactivity.                          |
 | **Clean paths**        | Files are written under `src/Lib/PHPXUI/FancyName.php` with OS‑agnostic separators.                                                   |
 | **Friendly output**    | Clear green / red summary with relative paths only.                                                                                   |
-| **Automatic icons**    | Core **PPIcons** (`x`, `chevron‑down`, `chevron‑right`, etc.) are installed on the very first run.                                    |
+| **PPIcons bootstrap** | `add` and `update` install the required baseline `ppicons` set automatically, and still install any extra icons detected in generated files. |
 | **Tailwind bootstrap** | Ensures `tw-animate-css` and (on first run / missing file) writes `src/app/globals.css` for a sensible baseline.                      |
 | **AI project context** | Refreshes the `manifest` block inside `phpxui.json` and managed `AGENTS.md` / `.github/copilot-instructions.md` blocks after changes. |
 
@@ -52,10 +52,6 @@ npx phpxui add --all
 CLI output example:
 
 ```bash
-📦 Installing ppicons CLI…
-✨ Installing default icons: x chevron-down chevron-right
-✔ Icons installed in src/Lib/PPIcons
-
 ✔ Alert   → src/Lib/PHPXUI/Alert.php
 ✔ Dialog  → src/Lib/PHPXUI/Dialog.php
 ✔ Badge   → src/Lib/PHPXUI/Badge.php
@@ -140,7 +136,7 @@ phpxui <command> [--all] [--force] <component…>
 | `--all`         | Download the full catalogue in one request. Applies to `add`.                |
 | `--force`       | Overwrite existing files. Applies to `add`.                                  |
 
-> **Note:** The CLI automatically installs a default set of core icons (such as `x`, `chevron-down`, `chevron-right`) on first use. Extra icons are not yet selectable via `phpxui` directly.
+> **Note:** `phpxui` installs the required baseline `ppicons` automatically. Install any extra icons separately with `npx ppicons add <icon-name>`.
 
 ---
 
@@ -150,7 +146,6 @@ On first run, **phpxui‑cli** creates a `phpxui.json` in your project root. The
 
 - `outputDir`: where PHPXUI components are written (default: `src/Lib/PHPXUI`)
 - `psr4`: mapping hints for components and icons
-- `iconsInstalled`: internal flag to avoid reinstalling the default icon set
 - `tailwind.css`: where the base CSS should live (default: `src/app/globals.css`)
 - `manifest`: auto-generated AI metadata and installed component inventory maintained by the CLI
 
@@ -161,7 +156,6 @@ Example:
 ```json
 {
   "outputDir": "src/Lib/PHPXUI",
-  "iconsInstalled": false,
   "tailwind": {
     "css": "src/app/globals.css",
     "baseColor": "neutral",
@@ -191,6 +185,8 @@ The markdown files receive a managed `phpxui` block that inventories installed c
 ---
 
 ## 🎨 Using Additional Icons
+
+`phpxui add ...` and `phpxui update` already install the baseline icon set used across PHPXUI components.
 
 Need more icons? Use the **PPIcons** CLI directly:
 
